@@ -451,7 +451,12 @@ if "apache2" in packagelist:
 ### SAMBA
 if os.path.exists("/usr/sbin/smbd"):
 	bold("Samba is installed.")
-	######## SMBD CONFIGURATION HERE
+	try:
+		bold("Assuming Samba should be nuked.")
+		checkoutput("systemctl disable smbd")
+		checkoutput("systemctl disable samba")
+	except:
+		fail("Samba configuration failed.")
 	green("Samba configuration done.")
 ### PHP
 if os.path.exists("/usr/bin/php"):
