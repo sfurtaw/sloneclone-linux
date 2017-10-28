@@ -469,8 +469,8 @@ if os.path.exists("/usr/sbin/smbd"):
 		
 		# Disable anonymous samba access
 		bold("Disabling guest access to samba shares")
-		checkoutput("sed '/guest ok/d' /etc/samba/smb.conf")
-		checkoutput("sed '/public/d' /etc/samba/smb.conf")
+		checkoutput("sed -i '/^guest ok/d' /etc/samba/smb.conf")
+		checkoutput("sed -i '/^public/d' /etc/samba/smb.conf")
 	except:
 		fail("Samba configuration failed.")
 	green("Samba configuration done.")
