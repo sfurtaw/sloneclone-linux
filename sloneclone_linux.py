@@ -96,8 +96,8 @@ def disableservice(service):
 		bold("Disabling " + str(service) + " via systemctl...")
 		call("systemctl disable " + str(service))
 	elif os.path.exists("/usr/sbin/service"):
-		bold("Restarting " + str(service) + " via upstart...")
-		call("service " + str(service) + " restart")
+		bold("Disabling " + str(service) + " via upstart...")
+		checkoutput("echo manual > /etc/init/" + str(service) + ".override")
 		
 #-------------- CHECKS
 # Check for 'debug' command-line argument for testing
