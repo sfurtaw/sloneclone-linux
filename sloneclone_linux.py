@@ -317,6 +317,8 @@ except:
 	warning("NMTui is not present. Continuing...")
 	
 try:
+	bold("Set screen saver w/ password")
+	bold("Set auto update options")
 	checkoutput("unity-control-center")
 except:
 	warning("Unity control center is not present. Continuing...")
@@ -455,6 +457,11 @@ if os.path.exists("/usr/sbin/smbd"):
 		bold("Assuming Samba should be nuked.")
 		checkoutput("systemctl disable smbd")
 		checkoutput("systemctl disable samba")
+		
+		# Disable anonymous samba access
+		bold("Disabling guest access to samba shares")
+		checkoutput("sed '/guest ok/d' /etc/samba/smb.conf")
+		checkoutput("sed '/public/d' /etc/samba/smb.conf")
 	except:
 		fail("Samba configuration failed.")
 	green("Samba configuration done.")
