@@ -87,9 +87,18 @@ def restartservice(service):
 		bold("Restarting " + str(service) + " via systemctl...")
 		call("systemctl restart " + str(service))
 	elif os.path.exists("/usr/sbin/service"):
-		bold("Restarting " + str(service) + "via upstart...")
+		bold("Restarting " + str(service) + " via upstart...")
 		call("service " + str(service) + " restart")
-
+		
+def disableservice(service):
+# Restart service with distribution-specific command
+	if os.path.exists("/bin/systemctl"):
+		bold("Disabling " + str(service) + " via systemctl...")
+		call("systemctl disable " + str(service))
+	elif os.path.exists("/usr/sbin/service"):
+		bold("Restarting " + str(service) + " via upstart...")
+		call("service " + str(service) + "restart")
+		
 #-------------- CHECKS
 # Check for 'debug' command-line argument for testing
 if len(sys.argv) > 1 and "debug" in sys.argv:
@@ -455,8 +464,8 @@ if os.path.exists("/usr/sbin/smbd"):
 	bold("Samba is installed.")
 	try:
 		bold("Assuming Samba should be nuked.")
-		checkoutput("systemctl disable smbd")
-		checkoutput("systemctl disable samba")
+		disableservice("smbd")
+		disableservice("samba")
 		
 		# Disable anonymous samba access
 		bold("Disabling guest access to samba shares")
