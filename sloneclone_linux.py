@@ -1,14 +1,11 @@
 #!/usr/bin/python3
-# script.py
-# CyberPatriot Python Linux script for team 08-0013
+# sloneclone-linux.py
+# CyberPatriot Python Linux script for team "Slone clones in the danger zone we swear we know what we're doing"
 #-------------- IMPORTS
-import shutil
-import io
 import os
 import sys
 import platform
 import subprocess
-import getpass
 
 #-------------- COLORS
 # Nice colors definitely not stolen from Blender source
