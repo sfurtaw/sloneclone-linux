@@ -179,7 +179,7 @@ else:
 	elif distribution == 2:
 		sources = ["deb http://ftp.us.debian.org/debian wheezy main\n"]
 	elif distribution == 3:
-		sources = ["deb http://security.ubuntu.com/ubuntu/ xenial main restricted\ndeb http://security.ubuntu.com/ubuntu/ xenial-security universe restricted main\ndeb http://archive.ubuntu.com/ubuntu xenial main universe restricted multiverse\ndeb http://archive.ubuntu.com/ubuntu xenial-updates main restricted multiverse universe\ndeb http://security.ubuntu.com/ubuntu/ xenial-security multiverse]
+		sources = ["deb http://security.ubuntu.com/ubuntu/ xenial main restricted\ndeb http://security.ubuntu.com/ubuntu/ xenial-security universe restricted main\ndeb http://archive.ubuntu.com/ubuntu xenial main universe restricted multiverse\ndeb http://archive.ubuntu.com/ubuntu xenial-updates main restricted multiverse universe\ndeb http://security.ubuntu.com/ubuntu/ xenial-security multiverse"]
 	elif distribution == 4:
 		sources = ["deb http://ftp.us.debian.org/debian jessie main\n","deb http://security.debian.org/ jessie/updates main\n"]
 
