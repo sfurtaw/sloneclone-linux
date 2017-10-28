@@ -239,7 +239,7 @@ else:
 	
 #-------------- UNAUTHORIZED SOFTWARE
 # Smack down the banhammer
-	taboo = ["vuze","transmission-gtk","transmission-common","john","frost","ophcrack"]
+	taboo = ["vuze","transmission-gtk","transmission-common","john","frost","ophcrack","nikto"]
 	uninstall(taboo)
 
 #-------------- DELETE USERS
@@ -479,6 +479,15 @@ if os.path.exists("/usr/bin/php"):
 	bold("PHP is installed.")
 	######## PHP CONFIGURATION HERE
 	green("PHP configuration done.")
+	
+### FTP
+	######## FTP CONFIGURATION HERE
+	
+### NFS
+	######## NFS CONFIGURATION HERE
+	
+### VNC
+	######## VNC CONFIGURATION HERE
 
 #-------------- MEDIA FILES
 if "skipmedia" in sys.argv:
