@@ -99,7 +99,7 @@ def disableservice(service):
 #-------------- CHECKS
 # Check for 'debug' command-line argument for testing
 if len(sys.argv) > 1 and "debug" in sys.argv:
-	warning("Debug mode, skipping checks...")
+	warning("Debug mode, skipping platform check...")
 # Skip OS and version checks if debug mode is enabled
 # Make sure the OS platform is Linux, error out if otherwise
 elif platform.system() != 'Linux':
