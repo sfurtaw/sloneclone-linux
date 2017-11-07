@@ -207,6 +207,11 @@ else:
 	except:
 		fail("Writing sources.list failed.")
 
+#-------------- UNAUTHORIZED SOFTWARE
+# Smack down the banhammer
+	taboo = ["vuze","transmission-gtk","transmission-common","john","john-data","hydra-gtk","hydra","frost","ophcrack","nikto"]
+	uninstall(taboo)
+
 #-------------- PACKAGE UPDATES
 # Try running aptitude update/upgrade
 	try:
@@ -215,7 +220,7 @@ else:
 		bold("Updating packages...")
 		checkoutput("apt-get upgrade -y ")
 # Editable list to add new applications to
-		autoinstall = ["clamav","nano","vim","ufw","unattended-upgrades","nmap","openssh-server"]
+		autoinstall = ["lynis","clamav","nano","vim","ufw","unattended-upgrades","nmap","openssh-server"]
 		install(autoinstall)
 # Kind message to the user if it errors out
 	except: 
@@ -234,11 +239,6 @@ else:
 #-------------- RECONFIGURE PACKAGES
 # Try enabling unattended upgrades
 	call("dpkg-reconfigure --frontend=readline unattended-upgrades")
-	
-#-------------- UNAUTHORIZED SOFTWARE
-# Smack down the banhammer
-	taboo = ["vuze","transmission-gtk","transmission-common","john","frost","ophcrack","nikto"]
-	uninstall(taboo)
 
 #-------------- DELETE USERS
 # Try to open and print /etc/group and error out if it errors out
