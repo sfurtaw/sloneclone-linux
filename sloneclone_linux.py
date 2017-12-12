@@ -181,31 +181,32 @@ if "skipapt" in sys.argv:
 	warning("Skipping apt sections.")
 else:
 #-------------- APT SOURCES
-	if distribution == 1:
-		sources = ["deb http://security.ubuntu.com/ubuntu/ trusty main restricted\n","deb http://security.ubuntu.com/ubuntu/ trusty-security universe\n","deb http://security.ubuntu.com/ubuntu/ trusty-security multiverse"]
-	elif distribution == 2:
-		sources = ["deb http://ftp.us.debian.org/debian wheezy main\n"]
-	elif distribution == 3:
-		sources = ["deb http://security.ubuntu.com/ubuntu/ xenial main restricted\ndeb http://security.ubuntu.com/ubuntu/ xenial-security universe restricted main\ndeb http://archive.ubuntu.com/ubuntu xenial main universe restricted multiverse\ndeb http://archive.ubuntu.com/ubuntu xenial-updates main restricted multiverse universe\ndeb http://security.ubuntu.com/ubuntu/ xenial-security multiverse"]
-	elif distribution == 4:
-		sources = ["deb http://ftp.us.debian.org/debian jessie main\n","deb http://security.debian.org/ jessie/updates main\n"]
-
+# Consistently break APT, TODO
+#	if distribution == 1:
+#		sources = ["deb http://security.ubuntu.com/ubuntu/ trusty main restricted\n","deb http://security.ubuntu.com/ubuntu/ trusty-security universe\n","deb http://security.ubuntu.com/ubuntu/ trusty-security multiverse"]
+#	elif distribution == 2:
+#		sources = ["deb http://ftp.us.debian.org/debian wheezy main\n"]
+#	elif distribution == 3:
+#		sources = ["deb http://security.ubuntu.com/ubuntu/ xenial main restricted\ndeb http://security.ubuntu.com/ubuntu/ xenial-security universe restricted main\ndeb http://archive.ubuntu.com/ubuntu xenial main universe restricted multiverse\ndeb http://archive.ubuntu.com/ubuntu xenial-updates main restricted multiverse universe\ndeb http://security.ubuntu.com/ubuntu/ xenial-security multiverse"]
+#	elif distribution == 4:
+#		sources = ["deb http://ftp.us.debian.org/debian jessie main\n","deb http://security.debian.org/ jessie/updates main\n"]
+#
 # Move sources.list to backup
-	try:
-		shutil.move("/etc/apt/sources.list","/etc/apt/sources.list.old")
-		green("Sources.list moved to /etc/apt/sources.list.old")
-	except:
-		fail("Sources.list move failed.")
-
+#	try:
+#		shutil.move("/etc/apt/sources.list","/etc/apt/sources.list.old")
+#		green("Sources.list moved to /etc/apt/sources.list.old")
+#	except:
+#		fail("Sources.list move failed.")
+#
 # Create a new sources.list and write the sources
-	try:
-		sourcelist = open("/etc/apt/sources.list","w+")
-		sourcelist.writelines(sources)
-		green("New sources have been written")
+#	try:
+#		sourcelist = open("/etc/apt/sources.list","w+")
+#		sourcelist.writelines(sources)
+#		green("New sources have been written")
 # Close sources.list
-		sourcelist.close()
-	except:
-		fail("Writing sources.list failed.")
+#		sourcelist.close()
+#	except:
+#		fail("Writing sources.list failed.")
 
 #-------------- UNAUTHORIZED SOFTWARE
 # Smack down the banhammer
@@ -220,7 +221,7 @@ else:
 		bold("Updating packages...")
 		checkoutput("apt-get upgrade -y ")
 # Editable list to add new applications to
-		autoinstall = ["lynis","clamav","nano","vim","ufw","unattended-upgrades","nmap","openssh-server"]
+		autoinstall = ["clamav","nano","vim","ufw","unattended-upgrades","nmap","openssh-server"]
 		install(autoinstall)
 # Kind message to the user if it errors out
 	except: 
@@ -524,6 +525,8 @@ etcpasswd = open("/etc/passwd","r")
 for line in etcpasswd:
 	if ":0:" in line and "root" not in line:
 		warning(line + "A user was found with UID 0, they should be edited or removed")
+
+#-------------- PERMISSIONS
 
 #-------------- MALWARE
 if "skipav" in sys.argv:
