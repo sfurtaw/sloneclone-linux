@@ -7,6 +7,7 @@ import sys
 import getpass
 import platform
 import subprocess
+import shutil
 
 #-------------- COLORS
 # Nice colors definitely not stolen from Blender source
@@ -22,25 +23,25 @@ class color:
 
 #-------------- VARS
 # Set temp variables for later
-mediafiles=apps=distribution=deluser=adduser=group=demote=exceptionport=sudoers=confirm="temp"
+mediafiles = apps = distribution = deluser = adduser = group = demote = exceptionport = sudoers = confirm = "temp"
 
 #-------------- FUNCTIONS
 def call(command):
 # Call a command as a subprocess
-	return subprocess.call(str(command),shell=True)
-	
+	return subprocess.call(str(command), shell=True)
+
 def checkoutput(command):
 # Call a subprocess, silence output/check output as variable
-	return subprocess.check_output(str(command),shell=True,universal_newlines=True)
-	
+	return subprocess.check_output(str(command), shell=True, universal_newlines=True)
+
 def fail(text):
 # Set failure color and print text
 	print(color.fail + str(text) + color.endc)
-	
+
 def blue(text):
 # Set blue color and print text
 	print(color.okblue + str(text) + color.endc)
-	
+
 def green(text):
 # Set OK (green) color and print text
 	print(color.okgreen + str(text) + color.endc)
@@ -52,7 +53,7 @@ def warning(text):
 def boldinput(text):
 # Ask for input, set bold color
 	return input(color.bold + str(text) + color.endc)
-	
+
 def bold(text):
 # Print text in bold
 	print(color.bold + str(text) + color.endc)
@@ -60,7 +61,7 @@ def bold(text):
 def underline(text):
 # Print text underlined
 	print(color.underline + str(text) + color.endc)
-	
+
 def uninstall(list):
 # Take a list and attempt to uninstall all packages in list
 	try:
@@ -69,7 +70,7 @@ def uninstall(list):
 			call(aptcommand + " purge -y " + str(uninstallapp))
 	except:
 		fail("Removing " + "/".join(list) + " failed.")
-		
+
 def install(list):
 # Take a list and attempt to install all packages in list
 	try:
@@ -87,7 +88,7 @@ def restartservice(service):
 	elif os.path.exists("/usr/sbin/service"):
 		bold("Restarting " + str(service) + " via upstart...")
 		call("service " + str(service) + " restart")
-		
+
 def disableservice(service):
 # Restart service with distribution-specific command
 	if os.path.exists("/bin/systemctl"):
@@ -96,7 +97,7 @@ def disableservice(service):
 	elif os.path.exists("/usr/sbin/service"):
 		bold("Disabling " + str(service) + " via upstart...")
 		checkoutput("echo manual > /etc/init/" + str(service) + ".override")
-		
+
 #-------------- CHECKS
 # Check for 'debug' command-line argument for testing
 if len(sys.argv) > 1 and "skipplatform" in sys.argv:
@@ -139,7 +140,7 @@ if len(sys.argv) > 1 and "brute" in sys.argv:
 #print("[4] Debian 8 Jessie")
 #print("\n")
 #distribution = boldinput("Input distribution: ")
-distributions = {1:"trusty",2:"wheezy",3:"xenial",4:"jessie"}
+distributions = {1:"trusty", 2:"wheezy", 3:"xenial", 4:"jessie"}
 if os.path.exists("/usr/bin/lsb_release"):
 	green("LSB_Release was found")
 	lsb = str(checkoutput("lsb_release -a"))
@@ -162,7 +163,7 @@ if os.path.exists("/usr/bin/lsb_release"):
 		sys.exit()
 elif os.path.exists("/etc/debian_version"):
 	green("Debian version was found")
-	debian_version = open("/etc/debian_version","r")
+	debian_version = open("/etc/debian_version", "r")
 	versionnumber = str(debian_version.readline())
 	if "7" in versionnumber:
 		distribution = 2
@@ -210,7 +211,7 @@ else:
 
 #-------------- UNAUTHORIZED SOFTWARE
 # Smack down the banhammer
-	taboo = ["vuze","transmission-gtk","transmission-common","john","john-data","hydra-gtk","hydra","frost","ophcrack","nikto"]
+	taboo = ["vuze", "transmission-gtk", "transmission-common", "john", "john-data", "hydra-gtk", "hydra", "frost", "ophcrack", "nikto"]
 	uninstall(taboo)
 
 #-------------- PACKAGE UPDATES
@@ -221,7 +222,7 @@ else:
 		bold("Updating packages...")
 		checkoutput("apt-get upgrade -y ")
 # Editable list to add new applications to
-		autoinstall = ["clamav","nano","vim","ufw","unattended-upgrades","nmap","openssh-server"]
+		autoinstall = ["clamav", "nano", "vim", "ufw", "unattended-upgrades", "nmap", "openssh-server"]
 		install(autoinstall)
 # Kind message to the user if it errors out
 	except: 
@@ -244,7 +245,7 @@ else:
 #-------------- DELETE USERS
 # Try to open and print /etc/group and error out if it errors out
 try:
-	etcgroup = open("/etc/group","r")
+	etcgroup = open("/etc/group", "r")
 	for line in etcgroup:
 		blue(line)
 	etcgroup.close()
@@ -286,8 +287,8 @@ try:
 	bold("Enabling UFW...")
 	checkoutput("ufw enable")
 	green("UFW enabled.")
-except:
-	fail("Enabling UFW failed. Are you root?")
+except subprocess.CalledProcessError:
+	fail("UFW could not be enabled")
 
 # Add exceptions via loop
 while exceptionport != "":
@@ -310,8 +311,8 @@ except:
 # Remove IPv6 config from sysctl, then append new config
 try:
 	checkoutput("grep -v disable_ipv6 /etc/sysctl.conf > /tmp/sysctl.temp")
-	shutil.move("/tmp/sysctl.temp","/etc/sysctl.conf")
-	sysctl = open("/etc/sysctl.conf","a+")
+	shutil.move("/tmp/sysctl.temp", "/etc/sysctl.conf")
+	sysctl = open("/etc/sysctl.conf", "a+")
 	sysctl.write("net.ipv6.conf.all.disable_ipv6=1\nnet.ipv6.conf.default.disable_ipv6=1")
 	sysctl.close()
 except:
@@ -323,7 +324,7 @@ try:
 	call("nmtui")
 except:
 	warning("NMTui is not present. Continuing...")
-	
+
 try:
 	bold("Set screen saver w/ password")
 	bold("Set auto update options")
@@ -354,10 +355,10 @@ try:
 #os.system("sed -i '1 i\auth required pam_tally.so per_user magic_root onerr=fail' /etc/pam.d/common-auth")
 except:
 	fail("Login definitions failed.")
-	
+
 #-------------- LIGHTDM CONFIGURATION
 try:
-	lightdmconf = open("/etc/lightdm/lightdm.conf","w+")
+	lightdmconf = open("/etc/lightdm/lightdm.conf", "w+")
 	lightdmconf.write("[SeatDefaults]\nallow-guest=false\ngreeter-hide-users=true\ngreeter-show-manual-login=true\nautologin-user=")
 	lightdmconf.close()
 except:
@@ -380,8 +381,8 @@ while confirm.lower() != "y":
 #call("crontab -e")
 #admin = boldinput("Enter the name of the default login user: ")
 #call("crontab -u " + admin + " -e")
-for file in os.listdir("/var/spool/cron/crontabs/"):
-	call("nano /var/spool/cron/crontabs/" + str(file))
+for filename in os.listdir("/var/spool/cron/crontabs/"):
+	call("nano /var/spool/cron/crontabs/" + str(filename))
 
 #-------------- NETCAT
 # Run ps -aux and only show lines with nc or netcat
@@ -465,12 +466,12 @@ if os.path.exists("/usr/sbin/smbd"):
 		bold("Assuming Samba should be nuked.")
 		disableservice("smbd")
 		disableservice("samba")
-		
+	
 		# Disable anonymous samba access
 		bold("Disabling guest access to samba shares")
 		checkoutput("sed -i '/guest ok/d' /etc/samba/smb.conf")
 		checkoutput("sed -i '/public/d' /etc/samba/smb.conf")
-	except:
+	except :
 		fail("Samba configuration failed.")
 	green("Samba configuration done.")
 ### PHP
@@ -478,13 +479,13 @@ if os.path.exists("/usr/bin/php"):
 	bold("PHP is installed.")
 	######## PHP CONFIGURATION HERE
 	green("PHP configuration done.")
-	
+
 ### FTP
 	######## FTP CONFIGURATION HERE
-	
+
 ### NFS
 	######## NFS CONFIGURATION HERE
-	
+
 ### VNC
 	######## VNC CONFIGURATION HERE
 
@@ -508,7 +509,7 @@ else:
 	call("find / -iname '*.og*' >> /root/mediafiles.txt")
 
 	mediafiles = checkoutput("grep /usr/ /root/mediafiles.txt -v")
-	mediafiletxt = open("/root/mediafiles.txt","w+")
+	mediafiletxt = open("/root/mediafiles.txt", "w+")
 	mediafiletxt.write(mediafiles)
 	mediafiletxt.close()
 	green("Found media files written to /root/mediafiles.txt")
@@ -521,7 +522,7 @@ except:
 	warning("Could not lock the root account.")
 
 #-------------- USER IDS
-etcpasswd = open("/etc/passwd","r")
+etcpasswd = open("/etc/passwd", "r")
 for line in etcpasswd:
 	if ":0:" in line and "root" not in line:
 		warning(line + "A user was found with UID 0, they should be edited or removed")
