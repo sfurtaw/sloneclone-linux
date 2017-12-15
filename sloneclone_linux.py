@@ -18,15 +18,15 @@ colors = {'header': '\033[95m', 'okblue': '\033[94m',\
 
 #-------------- VARS
 # Set temp variables for later
-mediafiles = apps = distribution = deluser = adduser = group\
- = demote = exceptionport = sudoers = confirm = "temp"
+mediaFiles = apps = distribution = delUser = addUser = group\
+ = demote = exceptionPort = sudoers = confirm = "temp"
 
 #-------------- FUNCTIONS
 def call(command):
     """Call a command as a subprocess"""
     return subprocess.call(str(command), shell=True)
 
-def checkoutput(command):
+def runProcess(command):
     """Call a subprocess, silence output/check output as variable"""
     return subprocess.check_output(str(command), shell=True, universal_newlines=True)
 
@@ -46,7 +46,7 @@ def warning(text):
     """Set warning color and print text"""
     print(colors['warning'] + str(text) + colors['endc'])
 
-def boldinput(text):
+def getBoldInput(text):
     """"Ask for input, set bold color"""
     return input(colors['bold'] + str(text) + colors['endc'])
 
@@ -61,22 +61,22 @@ def underline(text):
 def uninstall(uninstalls):
     """Take a list and attempt to uninstall all packages in list"""
     try:
-        bold("Removing " + "/".join(uninstalls) + " using " + aptcommand + " ...")
-        for uninstallapp in uninstalls:
-            call(aptcommand + " purge -y " + str(uninstallapp))
+        bold("Removing " + "/".join(uninstalls) + " using " + aptCommand + " ...")
+        for uninstallApp in uninstalls:
+            call(aptCommand + " purge -y " + str(uninstallApp))
     except:
         fail("Removing " + "/".join(list) + " failed.")
 
 def install(installs):
     """Take a list and attempt to install all packages in list"""
     try:
-        bold("Installing " + "/".join(installs) + " using " + str(aptcommand) + "...")
+        bold("Installing " + "/".join(installs) + " using " + str(aptCommand) + "...")
         for installapp in installs:
-            call(str(aptcommand) + " install -y " + str(installapp))
+            call(str(aptCommand) + " install -y " + str(installapp))
     except:
         fail("Installing " + "/".join(installs) + " failed.")
 
-def restartservice(service):
+def restartService(service):
     """Restart service with distribution-specific command"""
     if os.path.exists("/bin/systemctl"):
         bold("Restarting " + str(service) + " via systemctl...")
@@ -85,14 +85,14 @@ def restartservice(service):
         bold("Restarting " + str(service) + " via upstart...")
         call("service " + str(service) + " restart")
 
-def disableservice(service):
+def disableService(service):
     """Disable service with distribution-specific command"""
     if os.path.exists("/bin/systemctl"):
         bold("Disabling " + str(service) + " via systemctl...")
         call("systemctl disable " + str(service))
     elif os.path.exists("/usr/sbin/service"):
         bold("Disabling " + str(service) + " via upstart...")
-        checkoutput("echo manual > /etc/init/" + str(service) + ".override")
+        runProcess("echo manual > /etc/init/" + str(service) + ".override")
 
 #-------------- CHECKS
 # Check for 'debug' command-line argument for testing
@@ -115,16 +115,16 @@ elif getpass.getuser() != 'root':
 
 # Set the apt command used for the rest of the script
 if os.path.exists("/usr/bin/apt"):
-    aptcommand = "apt"
+    aptCommand = "apt"
 elif os.path.exists("/usr/bin/aptitude"):
-    aptcommand = "aptitude"
+    aptCommand = "aptitude"
 else:
-    aptcommand = "apt-get"
+    aptCommand = "apt-get"
 
 #-------------- BRUTE FORCE METHOD
 if len(sys.argv) > 1 and "brute" in sys.argv:
-    bruteforce = boldinput("You wanna brute force this cheese? (y/N): ")
-    if bruteforce == "y":
+    bruteForce = getBoldInput("You wanna brute force this cheese? (y/N): ")
+    if bruteForce == "y":
         while True:
             call("ufw enable")
     else:
@@ -143,7 +143,7 @@ if len(sys.argv) > 1 and "brute" in sys.argv:
 distributions = {1:"trusty", 2:"wheezy", 3:"xenial", 4:"jessie"}
 if os.path.exists("/usr/bin/lsb_release"):
     green("LSB_Release was found")
-    lsb = str(checkoutput("lsb_release -a"))
+    lsb = str(runProcess("lsb_release -a"))
     if "Ubuntu" in lsb:
         if "14" in lsb:
             distribution = 1
@@ -163,12 +163,12 @@ if os.path.exists("/usr/bin/lsb_release"):
         sys.exit()
 elif os.path.exists("/etc/debian_version"):
     green("Debian version was found")
-    debian_version = open("/etc/debian_version", "r")
-    versionnumber = str(debian_version.readline())
-    if "7" in versionnumber:
+    debianVersion = open("/etc/debian_version", "r")
+    versionNumber = str(debianVersion.readline())
+    if "7" in versionNumber:
         distribution = 2
         green("Running on Debian 7 Wheezy")
-    elif "8" in versionnumber:
+    elif "8" in versionNumber:
         distribution = 4
         green("Running on Debian 8 Jessie")
     else:
@@ -219,13 +219,13 @@ else:
 # Try running aptitude update/upgrade
     try:
         bold("Updating repositories...")
-        checkoutput("apt-get update -y ")
+        runProcess("apt-get update -y ")
         bold("Updating packages...")
-        checkoutput("apt-get upgrade -y ")
+        runProcess("apt-get upgrade -y ")
 # Editable list to add new applications to
-        autoinstall = ["clamav", "nano", "vim", "ufw",\
+        autoInstall = ["clamav", "nano", "vim", "ufw",\
         "unattended-upgrades", "nmap", "openssh-server"]
-        install(autoinstall)
+        install(autoInstall)
 # Kind message to the user if it errors out
     except:
         fail("Aptitude commands failed. Are you root? Sudo?")
@@ -233,7 +233,7 @@ else:
 #-------------- PACKAGE INSTALLATION
 # Fun while loop to install apps through Aptitude
     while apps != "":
-        apps = str(boldinput("Packages to install (separated by a space): ")).split()
+        apps = str(getBoldInput("Packages to install (separated by a space): ")).split()
         if str(apps) == "[]":
             break
         try:
@@ -248,39 +248,39 @@ else:
 #-------------- DELETE USERS
 # Try to open and print /etc/group and error out if it errors out
 try:
-    etcgroup = open("/etc/group", "r")
-    for line in etcgroup:
+    etcGroup = open("/etc/group", "r")
+    for line in etcGroup:
         blue(line)
-    etcgroup.close()
+    etcGroup.close()
 except:
     fail("Opening /etc/group failed.")
 
 # Loop to get users to delete
-while deluser != "":
-    deluser = boldinput("User to delete: ")
-    if deluser == "":
+while delUser != "":
+    delUser = getBoldInput("User to delete: ")
+    if delUser == "":
         break
     try:
-        call("deluser " + deluser + " --remove-home")
-        call("delgroup " + deluser)
+        call("deluser " + delUser + " --remove-home")
+        call("delgroup " + delUser)
     except:
         fail("Deleting user failed. Does the user exist?")
 
 #-------------- ADD USERS
 # Accept user and group in one input
-while adduser != "":
-    adduser = boldinput("User name and group to add, separated by a space: ")
-    if adduser == "":
+while addUser != "":
+    addUser = getBoldInput("User name and group to add, separated by a space: ")
+    if addUser == "":
         break
-    usergroup = adduser.split()
-    checkoutput("adduser " + str(usergroup[0]))
-    if len(usergroup) > 1:
-        checkoutput("usermod -a -G " + str(usergroup[1]) + " " + str(usergroup[0]))
+    userGroup = addUser.split()
+    runProcess("adduser " + str(userGroup[0]))
+    if len(userGroup) > 1:
+        runProcess("usermod -a -G " + str(userGroup[1]) + " " + str(userGroup[0]))
 
 #-------------- DEMOTE USERS
 # Ask for users to demote
 while demote != "":
-    demote = boldinput("User to demote: ")
+    demote = getBoldInput("User to demote: ")
     if demote == "":
         break
     call("deluser " + demote + " adm")
@@ -292,25 +292,25 @@ while demote != "":
 # Enable UFW/error trap
 try:
     bold("Enabling UFW...")
-    checkoutput("ufw enable")
+    runProcess("ufw enable")
     green("UFW enabled.")
-except subprocess.CalledProcessError:
+except:
     fail("UFW could not be enabled")
 
 # Add exceptions via loop
-while exceptionport != "":
-    exceptionport = boldinput("Enter exception ports (ex. '22/tcp'): ")
-    if exceptionport == "":
+while exceptionPort != "":
+    exceptionPort = getBoldInput("Enter exception ports (ex. '22/tcp'): ")
+    if exceptionPort == "":
         break
     try:
-        checkoutput("ufw allow " + exceptionport)
-        green("Allowed port " + exceptionport)
+        runProcess("ufw allow " + exceptionPort)
+        green("Allowed port " + exceptionPort)
     except:
         fail("Adding exception failed.")
 
 # Try to set default deny policy
 try:
-    checkoutput("ufw default deny incoming")
+    runProcess("ufw default deny incoming")
     green("UFW default policy set.")
 except:
     fail("UFW default policy failed.")
@@ -318,7 +318,7 @@ except:
 #-------------- SYSCTL CONFIG
 # Remove IPv6 config from sysctl, then append new config
 try:
-    checkoutput("grep -v disable_ipv6 /etc/sysctl.conf > /tmp/sysctl.temp")
+    runProcess("grep -v disable_ipv6 /etc/sysctl.conf > /tmp/sysctl.temp")
     shutil.move("/tmp/sysctl.temp", "/etc/sysctl.conf")
     sysctl = open("/etc/sysctl.conf", "a+")
     sysctl.write("net.ipv6.conf.all.disable_ipv6=1\nnet.ipv6.conf.default.disable_ipv6=1")
@@ -336,7 +336,7 @@ except:
 try:
     bold("Set screen saver w/ password")
     bold("Set auto update options")
-    checkoutput("unity-control-center")
+    runProcess("unity-control-center")
 except:
     warning("Unity control center is not present. Continuing...")
 
@@ -344,11 +344,11 @@ except:
 # Open visudo, then print sudoers.d listing and ask to edit
 call("update-alternatives --config editor")
 call("visudo")
-for dirpath, dirnames, filenames in os.walk("/etc/sudoers.d/"):
-    for filename in filenames:
-        blue(filename)
+for dirPath, dirNames, fileNames in os.walk("/etc/sudoers.d/"):
+    for fileName in fileNames:
+        blue(fileName)
 while sudoers != "":
-    sudoers = boldinput("Sudoers.d findings above, enter filename to edit: ")
+    sudoers = getBoldInput("Sudoers.d findings above, enter filename to edit: ")
     if sudoers == "":
         break
     call("nano /etc/sudoers.d/" + sudoers)
@@ -356,10 +356,10 @@ while sudoers != "":
 #-------------- LOGIN DEFINITIONS
 # Remove comments and change parameters with sed in login.defs
 try:
-    checkoutput("sed -i -e 's/.*#.*/#/' /etc/login.defs")
-    checkoutput("sed -i -e 's/.*PASS_MAX_DAYS.*/PASS_MAX_DAYS   30/' /etc/login.defs")
-    checkoutput("sed -i -e 's/.*PASS_MIN_DAYS.*/PASS_MIN_DAYS   7/' /etc/login.defs")
-    checkoutput("faillog -m 3")
+    runProcess("sed -i -e 's/.*#.*/#/' /etc/login.defs")
+    runProcess("sed -i -e 's/.*PASS_MAX_DAYS.*/PASS_MAX_DAYS   30/' /etc/login.defs")
+    runProcess("sed -i -e 's/.*PASS_MIN_DAYS.*/PASS_MIN_DAYS   7/' /etc/login.defs")
+    runProcess("faillog -m 3")
 # Line below breaks logins
 #os.system("sed -i '1 i\auth required pam_tally.so per_user magic_root onerr=fail' /etc/pam.d/common-auth")
 except:
@@ -367,17 +367,17 @@ except:
 
 #-------------- LIGHTDM CONFIGURATION
 try:
-    lightdmconf = open("/etc/lightdm/lightdm.conf", "w+")
-    lightdmconf.write("[SeatDefaults]\nallow-guest=false\ngreeter-hide-users=true\n\
+    lightdmConf = open("/etc/lightdm/lightdm.conf", "w+")
+    lightdmConf.write("[SeatDefaults]\nallow-guest=false\ngreeter-hide-users=true\n\
     greeter-show-manual-login=true\nautologin-user=")
-    lightdmconf.close()
+    lightdmConf.close()
 except:
     fail("LightDM configuration failed.")
 
 #-------------- PASSWORDS
 while confirm.lower() != "y":
-    password = boldinput("Enter password to set for all users: ")
-    confirm = boldinput("Confirm (y/N/c): ")
+    password = getBoldInput("Enter password to set for all users: ")
+    confirm = getBoldInput("Confirm (y/N/c): ")
     if confirm.lower() == "c":
         break
     if confirm.lower() == "y":
@@ -394,84 +394,84 @@ while confirm.lower() != "y":
 #call("crontab -e")
 #admin = boldinput("Enter the name of the default login user: ")
 #call("crontab -u " + admin + " -e")
-for filename in os.listdir("/var/spool/cron/crontabs/"):
-    call("nano /var/spool/cron/crontabs/" + str(filename))
+for fileName in os.listdir("/var/spool/cron/crontabs/"):
+    call("nano /var/spool/cron/crontabs/" + str(fileName))
 
 #-------------- NETCAT
 # Run ps -aux and only show lines with nc or netcat
 underline("These are all processes found containing the words 'nc' or 'netcat'.")
-for line in checkoutput("ps -aux").split("\n"):
+for line in runProcess("ps -aux").split("\n"):
     if "netcat" in line or "nc" in line:
         print(str(line))
-boldinput("Paused, strike return to continue")
+getBoldInput("Paused, strike return to continue")
 
 #-------------- SERVERS
-packagelist = str(checkoutput("dpkg --list"))
+packageList = str(runProcess("dpkg --list"))
 ### OPENSSH
-if "openssh-server" in packagelist:
+if "openssh-server" in packageList:
     bold("OpenSSH server is installed.")
 # Call sed to remove comments, then edit in the new parameters
     try:
-        checkoutput("sed -i -e 's/.*#.*/#/' /etc/ssh/sshd_config")
+        runProcess("sed -i -e 's/.*#.*/#/' /etc/ssh/sshd_config")
         green("Removed comments.")
-        checkoutput("sed -i -e 's/.*Protocol.*/Protocol 2/' /etc/ssh/sshd_config")
+        runProcess("sed -i -e 's/.*Protocol.*/Protocol 2/' /etc/ssh/sshd_config")
         green("Forced SSHv2.")
-        checkoutput("sed -i -e 's/.*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config")
+        runProcess("sed -i -e 's/.*PermitRootLogin.*/PermitRootLogin no/' /etc/ssh/sshd_config")
         green("Disabled root login.")
-        checkoutput("sed -i -e 's/.*LoginGraceTime*.*/LoginGraceTime 30/g' /etc/ssh/sshd_config")
+        runProcess("sed -i -e 's/.*LoginGraceTime*.*/LoginGraceTime 30/g' /etc/ssh/sshd_config")
         green("Reduced login grace time.")
-        checkoutput("sed -i -e 's/.*StrictModes.*/StrictModes yes/' /etc/ssh/sshd_config")
+        runProcess("sed -i -e 's/.*StrictModes.*/StrictModes yes/' /etc/ssh/sshd_config")
         green("Required strict modes.")
-        checkoutput("sed -i -e 's/.*PermitEmptyPasswords.*/PermitEmptyPasswords no/'\
+        runProcess("sed -i -e 's/.*PermitEmptyPasswords.*/PermitEmptyPasswords no/'\
         /etc/ssh/sshd_config")
         green("Disabled empty passwords.")
-        checkoutput("sed -i -e 's/.*X11Forwarding.*/X11Forwarding no/' /etc/ssh/sshd_config")
+        runProcess("sed -i -e 's/.*X11Forwarding.*/X11Forwarding no/' /etc/ssh/sshd_config")
         green("Disabled X forwarding.")
-        checkoutput("sed -i -e 's/.*PrintMotd no.*/PrintMotd yes/g' /etc/ssh/sshd_config")
+        runProcess("sed -i -e 's/.*PrintMotd no.*/PrintMotd yes/g' /etc/ssh/sshd_config")
         green("Enabled MOTD.")
         green("OpenSSH configuration done.")
     except:
         fail("SSHD config failed.")
 else: warning("OpenSSH server is not installed.")
 ### DROPBEAR
-if "dropbear" in packagelist:
+if "dropbear" in packageList:
     warning("Dropbear is installed.")
-    dropbear = boldinput("Remove Dropbear? (y/N): ")
+    dropbear = getBoldInput("Remove Dropbear? (y/N): ")
     if dropbear == "y":
         uninstall(["dropbear"])
 else:
     bold("Dropbear is not installed.")
 ### MYSQL
-if "mysql-server" in packagelist:
+if "mysql-server" in packageList:
     bold("MySQL is installed.")
     try:
 # Allow only local access to MySQL in my.cnf
-        checkoutput("sed -i -e 's/.*bind-address=.*/bind-address=127.0.0.1/' /etc/mysql/my.cnf")
+        runProcess("sed -i -e 's/.*bind-address=.*/bind-address=127.0.0.1/' /etc/mysql/my.cnf")
         green("Bind address set.")
-        checkoutput("sed -i -e 's/.*local-infile=.*/local-infile=0/' /etc/mysql/my.cnf")
+        runProcess("sed -i -e 's/.*local-infile=.*/local-infile=0/' /etc/mysql/my.cnf")
         green("Disabled use of local files.")
         call("mysql_secure_installation")
-        restartservice("mysql")
+        restartService("mysql")
         green("MySQL configuration done.")
     except:
         fail("MySQL configuration failed.")
 else:
     bold("MySQL is not installed.")
 ### APACHE
-if "apache2" in packagelist:
+if "apache2" in packageList:
     bold("Apache2 is installed.")
     try:
-        checkoutput("sed -i -e 's/.*#.*/#/' /etc/apache2/conf-enabled/security.conf")
+        runProcess("sed -i -e 's/.*#.*/#/' /etc/apache2/conf-enabled/security.conf")
         green("Removed comments.")
-        checkoutput("sed -i -e 's/.*ServerTokens.*/#/' /etc/apache2/conf-enabled/security.conf")
+        runProcess("sed -i -e 's/.*ServerTokens.*/#/' /etc/apache2/conf-enabled/security.conf")
         green("Deleted ServerTokens directive.")
-        checkoutput("sed -i -e 's/.*ServerSignature.*/#/' /etc/apache2/conf-enabled/security.conf")
+        runProcess("sed -i -e 's/.*ServerSignature.*/#/' /etc/apache2/conf-enabled/security.conf")
         green("Deleted ServerSignature directive.")
-        checkoutput("echo 'ServerTokens Prod' >> /etc/apache2/conf-enabled/security.conf")
+        runProcess("echo 'ServerTokens Prod' >> /etc/apache2/conf-enabled/security.conf")
         green("Set ServerTokens to production mode.")
-        checkoutput("echo 'ServerSignature Off' >> /etc/apache2/conf-enabled/security.conf")
+        runProcess("echo 'ServerSignature Off' >> /etc/apache2/conf-enabled/security.conf")
         green("Disabled ServerSignature.")
-        restartservice("apache2")
+        restartService("apache2")
         green("Apache2 configuration done.")
     except:
         fail("Apache2 configuration failed.")
@@ -480,13 +480,13 @@ if os.path.exists("/usr/sbin/smbd"):
     bold("Samba is installed.")
     try:
         bold("Assuming Samba should be nuked.")
-        disableservice("smbd")
-        disableservice("samba")
+        disableService("smbd")
+        disableService("samba")
 
         # Disable anonymous samba access
         bold("Disabling guest access to samba shares")
-        checkoutput("sed -i '/guest ok/d' /etc/samba/smb.conf")
-        checkoutput("sed -i '/public/d' /etc/samba/smb.conf")
+        runProcess("sed -i '/guest ok/d' /etc/samba/smb.conf")
+        runProcess("sed -i '/public/d' /etc/samba/smb.conf")
     except:
         fail("Samba configuration failed.")
     green("Samba configuration done.")
@@ -524,22 +524,22 @@ else:
     bold("Finding OGGs...")
     call("find / -iname '*.og*' >> /root/mediafiles.txt")
 
-    mediafiles = checkoutput("grep /usr/ /root/mediafiles.txt -v")
+    mediaFiles = runProcess("grep /usr/ /root/mediafiles.txt -v")
     mediafiletxt = open("/root/mediafiles.txt", "w+")
-    mediafiletxt.write(mediafiles)
+    mediafiletxt.write(mediaFiles)
     mediafiletxt.close()
     green("Found media files written to /root/mediafiles.txt")
 
 #-------------- LOCK ACCOUNTS
 try:
-    checkoutput("passwd -dl root")
+    runProcess("passwd -dl root")
     green("Locked root account.")
 except:
     warning("Could not lock the root account.")
 
 #-------------- USER IDS
-etcpasswd = open("/etc/passwd", "r")
-for line in etcpasswd:
+passwdFile = open("/etc/passwd", "r")
+for line in passwdFile:
     if ":0:" in line and "root" not in line:
         warning(line + "A user was found with UID 0, they should be edited or removed")
 
