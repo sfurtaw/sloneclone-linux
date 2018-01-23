@@ -228,6 +228,7 @@ else:
 
     #-------------- UNAUTHORIZED SOFTWARE
     # Smack down the banhammer
+    bold("we finna make it [B]oneless")
     taboo = ["vuze", "transmission-gtk", "transmission-common", "john", "john-data",
              "hydra-gtk", "hydra", "frost", "ophcrack", "nikto", "medusa", "minetest", "minetest-data"
              "minetest-server"]
