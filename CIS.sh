@@ -2,6 +2,9 @@
 # Align system to CIS benchmark
 # Team 'Slone clones in the danger zone we swear we know what we are doing'
 
+# Disable exit-on-error
+set -e
+
 rm -rf /etc/modprobe.d/CISbenchmark.conf
 
 echo 1.1.1.1 Disable cramfs
