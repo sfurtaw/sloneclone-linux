@@ -103,3 +103,93 @@ systemctl disable squid
 
 echo 2.2.14 Disable SNMP daemon
 systemctl disable snmpd
+
+echo 2.2.16 Disable rsync
+systemctl disable rsync
+
+echo 2.2.17 Disable NIS server
+systemctl disable nis
+
+echo 2.3.1 Remove NIS client
+apt remove nis
+
+echo 2.3.2 Remove rsh client
+apt remove rsh-client rsh-redone-client
+
+echo 2.3.3 Remove talk client
+apt remove talk
+
+echo 2.3.4 Remove telnet client
+apt remove telnet
+
+echo 2.3.5 Remove LDAP client
+apt remove ldap-utils
+
+echo 3.1.1 Disable IP forwarding
+echo "net.ipv4.ip_forward = 0" >> /etc/sysctl.conf
+
+echo 3.1.2 Disable packet redirect sending
+echo "net.ipv4.conf.all.send_redirects = 0" >> /etc/sysctl.conf
+echo "net.ipv4.conf.default.send_redirects = 0" >> /etc/sysctl.conf
+sysctl -w net.ipv4.conf.all.send_redirects=0
+sysctl -w net.ipv4.conf.default.send_redirects=0
+sysctl -w net.ipv4.route.flush=1
+
+echo 3.2.2 Disable ICMP redirects
+echo "net.ipv4.conf.all.accept_redirects = 0" >> /etc/sysctl.conf
+echo "net.ipv4.conf.default.accept_redirects = 0" >> /etc/sysctl.conf
+sysctl -w net.ipv4.conf.all.accept_redirects=0
+sysctl -w net.ipv4.conf.default.accept_redirects=0
+sysctl -w net.ipv4.route.flush=1
+
+echo 3.2.3 Disable secure ICMP redirects
+echo "net.ipv4.conf.all.secure_redirects = 0" >> /etc/sysctl.conf
+echo "net.ipv4.conf.default.secure_redirects = 0" >> /etc/sysctl.conf
+sysctl -w net.ipv4.conf.all.secure_redirects=0
+sysctl -w net.ipv4.conf.default.secure_redirects=0
+sysctl -w net.ipv4.route.flush=1
+
+echo 3.2.4 Log suspicious packets
+echo "net.ipv4.conf.all.log_martians = 1" >> /etc/sysctl.conf
+echo "net.ipv4.conf.default.log_martians = 1" >> /etc/sysctl.conf
+sysctl -w net.ipv4.conf.all.log_martians=1
+sysctl -w net.ipv4.conf.default.log_martians=1
+sysctl -w net.ipv4.route.flush=1
+
+echo 3.2.5 Disable broadcast ICMP
+echo "net.ipv4.icmp_echo_ignore_broadcasts = 1" >> /etc/sysctl.conf
+sysctl -w net.ipv4.icmp_echo_ignore_broadcasts=1
+sysctl -w net.ipv4.route.flush=1
+
+echo 3.2.6 Ignore bogus ICMP requests
+echo "net.ipv4.icmp_ignore_bogus_error_responses = 1" >> /etc/sysctl.conf
+sysctl -w net.ipv4.icmp_ignore_bogus_error_responses=1
+sysctl -w net.ipv4.route.flush=1
+
+echo 3.2.7 Disable reverse path filtering
+echo "net.ipv4.conf.all.rp_filter = 1" >> /etc/sysctl.conf
+echo "net.ipv4.conf.default.rp_filter = 1" >> /etc/sysctl.conf
+sysctl -w net.ipv4.conf.all.rp_filter=1
+sysctl -w net.ipv4.conf.default.rp_filter=1
+sysctl -w net.ipv4.route.flush=1
+
+echo 3.2.8 Enable TCP SYN cookies
+echo "net.ipv4.tcp_syncookies = 1" >> /etc/sysctl.conf
+sysctl -w net.ipv4.tcp_syncookies=1
+sysctl -w net.ipv4.route.flush=1
+
+echo 3.4.1 Install TCP wrappers
+apt install tcpd
+
+echo 3.5.1 Disable DCCP
+echo "install dccp /bin/true" >> /etc/modprobe.d/CISbenchmark.conf
+
+echo 3.5.2 Disable SCTP
+echo "install sctp /bin/true" >> /etc/modprobe.d/CISbenchmark.conf
+
+echo 3.5.3 Disable RDS
+echo "install rds /bin/true" >> /etc/modprobe.d/CISbenchmark.conf
+
+echo 3.5.4 Disable TIPC
+echo "install tipc /bin/true" >> /etc/modprobe.d/CISbenchmark.conf
+
