@@ -3,7 +3,7 @@
 # Team 'Slone clones in the danger zone we swear we know what we are doing'
 
 # Disable exit-on-error
-set -e
+set +e
 
 rm -rf /etc/modprobe.d/CISbenchmark.conf
 

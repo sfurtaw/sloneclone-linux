@@ -22,8 +22,6 @@ mediaFiles = apps = distribution = delUser = addUser = group\
     = demote = exceptionPort = sudoers = confirm = "temp"
 
 #-------------- FUNCTIONS
-
-
 def call(command):
     """Call a command as a subprocess"""
     return subprocess.call(str(command), shell=True)
@@ -230,7 +228,7 @@ else:
     # Smack down the banhammer
     bold("we finna make it [B]oneless")
     taboo = ["vuze", "transmission-gtk", "transmission-common", "john", "john-data",
-             "hydra-gtk", "hydra", "frost", "ophcrack", "nikto", "medusa", "minetest", "minetest-data"
+             "hydra-gtk", "hydra", "frost", "ophcrack", "nikto", "medusa", "minetest", "minetest-data",
              "minetest-server"]
     uninstall(taboo)
 
